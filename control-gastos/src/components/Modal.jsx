@@ -1,13 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Mensaje from "./Mensaje";
 import CerrarBtn from "../img/cerrar.svg";
 
-export const Modal = ({ setModal, animarModal, setAnimarModal, guardarGastos }) => {
+export const Modal = ({
+  setModal,
+  animarModal,
+  setAnimarModal,
+  guardarGastos,
+  gastoEditar,
+  setGastoEditar,
+}) => {
   const [mensaje, setMensaje] = useState("");
 
   const [nombre, setNombre] = useState("");
   const [cantidad, setCantidad] = useState("");
   const [selected, setSelected] = useState("");
+  const [fecha, setFecha] = useState("");
+  const [id, setId] = useState("");
+
+  useEffect(()=>{
+    if (Object.keys(gastoEditar).length >0){
+      setNombre(gastoEditar.nombre);
+      setCantidad(gastoEditar.cantidad);
+      setSelected(gastoEditar.selected);
+      setId(gastoEditar.id);
+      setFecha(gastoEditar.fecha)
+    }
+  },[])
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -18,12 +37,12 @@ export const Modal = ({ setModal, animarModal, setAnimarModal, guardarGastos }) 
       }, 3000);
       return;
     }
-    guardarGastos({nombre, cantidad, selected});
+    guardarGastos({ nombre, cantidad, selected, id, fecha });
   };
 
   const ocultarModal = () => {
     setAnimarModal(false);
-
+    setGastoEditar({});
     setTimeout(() => {
       setModal(false);
     }, 500);
@@ -38,7 +57,7 @@ export const Modal = ({ setModal, animarModal, setAnimarModal, guardarGastos }) 
         className={`formulario ${animarModal ? "animar" : "cerrar"}`}
         onSubmit={handleSubmit}
       >
-        <legend>Nuevo Gasto</legend>
+        <legend>{gastoEditar.nombre ? 'Editar Gasto': 'Nuevo Gasto'}</legend>
         {mensaje && <Mensaje tipo="error">{mensaje}</Mensaje>}
         <div className="campo">
           <label htmlFor="nombre">Nombre</label>
@@ -79,7 +98,7 @@ export const Modal = ({ setModal, animarModal, setAnimarModal, guardarGastos }) 
             <option value="suscripciones">Suscripciones</option>
           </select>
         </div>
-        <input type="submit" value="Añadir Gastos" />
+        <input type="submit" value={gastoEditar.nombre ? 'Guardar Cambios': 'Añadir Gasto'} />
       </form>
     </div>
   );
